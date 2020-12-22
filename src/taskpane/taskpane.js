@@ -28,7 +28,6 @@ Office.onReady(info => {
     getLetters();
     getVariables();
 
-    // document.getElementById("addParagraph").onclick = addParagraph;
     document.getElementById("addVariable").onclick = addVariable;
     document.getElementById("login").onclick = authenticate;
     document.getElementById("logout").onclick = logout;
@@ -74,8 +73,6 @@ Office.onReady(info => {
     $("#password").blur(function () {
       enableDisableLoginButton();
     });
-
-    // updateStatus("Ready to send file.");
   }
 });
 
@@ -95,7 +92,6 @@ function getTemplates() {
     }
   };
 
-  // request.open("GET", "https://cardiff.omnicrm.co/b/system/v3/letter/get_letter_details");
   request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_letter_details");
   request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
@@ -118,7 +114,6 @@ function getLetters() {
     }
   };
 
-  // request.open("GET", "https://cardiff.omnicrm.co/b/system/v3/letter/get_letter_details");
   request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_letter_details");
   request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
@@ -141,7 +136,6 @@ function getVariables() {
     }
   };
 
-  // request.open("GET", "https://cardiff.omnicrm.co/b/system/v3/letter/get_variable_list");
   request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_variable_list");
   request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
@@ -285,7 +279,6 @@ function sendSlice(slice, state) {
       formData.append("file_name", state.filename);
     }
 
-    // request.open("POST", "https://cardiff.omnicrm.co/b/system/v3/" + state.type + "/create");
     request.open("POST", Office.context.document.settings.get("serverSettings") + "b/system/v3/" + state.type + "/create");
     request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
     request.setRequestHeader("Accept", "application/json, text/plain, */*");
@@ -334,7 +327,6 @@ function authenticate() {
   formData.append("username", $("#username").val());
   formData.append("password", $("#password").val());
 
-  // request.open("POST", "https://cardiff.omnicrm.co/b/system/v1/session/login");
   request.open("POST", $("#serverSettings").val() + "b/system/v1/session/login");
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
   request.send(formData);
