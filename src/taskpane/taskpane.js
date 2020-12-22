@@ -393,6 +393,7 @@ function updateUserState() {
   }
 }
 
+// Enable/disable login button
 function enableDisableLoginButton() {
   if ($("#serverSettings").val() && $("#username").val() && $("#password").val()) {
     $("#login").prop("disabled", false);
@@ -401,6 +402,7 @@ function enableDisableLoginButton() {
   }
 }
 
+// Enable/disable create template button
 function enableDisableCreateTemplateButton() {
   if (($("#templates").val() !== "New") || ($("#templates").val() && $("#templateName").val())) {
     $("#createTemplate").prop("disabled", false);
@@ -409,6 +411,7 @@ function enableDisableCreateTemplateButton() {
   }
 }
 
+// Enable/disable create letter button
 function enableDisableCreateLetterButton() {
   if ($("#caseId").val() && $("#letters").val()) {
     $("#createLetter").prop("disabled", false);
