@@ -46,18 +46,15 @@
         <div class="container">
             <ul class="nav nav-tabs row" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="template-tab" data-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="true">
-                        <i class="fa fa-files-o" data-toggle="tooltip" title="Templates" aria-hidden="true"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" id="letter-tab" data-toggle="tab" href="#letter" role="tab" aria-controls="letter" aria-selected="false">
-                        <i class="fa fa-file-text-o" data-toggle="tooltip" title="Letters" aria-hidden="true"></i>
+                        <!-- <i class="fa fa-file-text-o" data-toggle="tooltip" title="Letters" aria-hidden="true"></i> -->
+                        Letters
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="variable-tab" data-toggle="tab" href="#variable" role="tab" aria-controls="variable" aria-selected="false">
-                        <i class="fa fa-list-ul" data-toggle="tooltip" title="Variables" aria-hidden="true"></i>
+                    <a class="nav-link active" id="template-tab" data-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="true">
+                        <!-- <i class="fa fa-files-o" data-toggle="tooltip" title="Templates" aria-hidden="true"></i> -->
+                        Templates
                     </a>
                 </li>
                 <li class="nav-item">
@@ -67,43 +64,44 @@
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
-                <div class="row tab-pane fade my-4 show active" id="template" role="tabpanel" aria-labelledby="template-tab">
-                    <form id="templatesForm">
-                        <div class="form-group mt-2">
-                            <label for="templates">Select Template</label>
-                            <select class="form-control" id="templates" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
-                                <option>New</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="templateName" class="form-control" placeholder="Template Name">
-                        </div>
-                        <button id='createTemplate' class="btn btn-primary btn-sm" type="button">Create Template</button>
-                    </form>
-                    <h7 id="templatesLabel">Please login from the settings tab to continue.</h7>
-                </div>
                 <div class="row tab-pane fade my-4" id="letter" role="tabpanel" aria-labelledby="letter-tab">
                     <form id="lettersForm">
                         <input type="text" id="caseId" name="caseId" class="form-control" placeholder="Case ID">
                         <div class="form-group mt-2">
-                            <label for="letters">Select Letter</label>
+                            <label for="letters">Select Document</label>
                             <select class="form-control" id="letters" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
                             </select>
                         </div>
-                        <button id='createLetter' class="btn btn-primary btn-sm" type="button">Create Letter</button>
+                        <button id='saveLetterToServer' class="btn btn-primary btn-sm" type="button">Save to Server</button>
                     </form>
                     <h7 id="lettersLabel">Please login from the settings tab to continue.</h7>
                 </div>
-                <div class="row tab-pane fade my-4" id="variable" role="tabpanel" aria-labelledby="variable-tab">
-                    <form id="variablesForm">
-                        <div class="form-group mt-2">
-                            <label for="variables">Select Variable</label>
+                <div class="row tab-pane fade my-4 show active" id="template" role="tabpanel" aria-labelledby="template-tab">
+                    <form id="templatesForm">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="fromExistingTemplate">
+                            <label class="form-check-label" for="fromExistingTemplate">
+                                From existing template
+                            </label>
+                        </div>
+                        <div class="form-group mt-2" id="selectTemplateDiv" style="display: none">
+                            <label for="templates">Select Document</label>
+                            <select class="form-control" id="templates" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
+                            </select>
+                        </div>
+                        <div class="form-group mt-2" id="templateNameDiv">
+                            <input type="text" id="templateName" class="form-control" placeholder="Template Name">
+                        </div>
+                        <button id='saveTemplateToServer' class="btn btn-primary btn-sm" type="button">Save to Server</button>
+
+                        <div class="form-group mt-4">
+                            <label for="variables">Variable List</label>
                             <select class="form-control" id="variables" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
                             </select>
                         </div>
                         <button id="addVariable" type="button" class="btn btn-primary btn-sm mb-2">Add Variable</button>
                     </form>
-                    <h7 id="variablesLabel">Please login from the settings tab to continue.</h7>
+                    <h7 id="templatesLabel">Please login from the settings tab to continue.</h7>
                 </div>
                 <div class="row tab-pane fade my-4" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                     <form id="formLogin">

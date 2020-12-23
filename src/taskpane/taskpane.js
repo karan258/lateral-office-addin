@@ -19,9 +19,9 @@ Office.onReady(info => {
 
     $("#serverSettings").prop("disabled", true);
 
-    enableDisableLoginButton();
-    enableDisableCreateTemplateButton();
-    enableDisableCreateLetterButton();
+    enableDisableButtonLogin();
+    enableDisableButtonSaveTemplateToServer();
+    enableDisableButtonSaveLetterToServer();
     updateUserState();
 
     getTemplates();
@@ -33,45 +33,47 @@ Office.onReady(info => {
     document.getElementById("logout").onclick = logout;
     document.getElementById("fetchAPIs").onclick = fetchAPIs;
 
-    $("#createTemplate").click(function () {
+    $("#saveTemplateToServer").click(function () {
       createDocument("template");
     });
-    $("#createLetter").click(function () {
+    $("#saveLetterToServer").click(function () {
       createDocument("letter");
     });
 
-    $("#templates").change(function () {
-      enableDisableCreateTemplateButton();
-      if (this.value !== "New") {
-        $("#templateName").val("");
-        $("#templateName").hide();
-      } else {
-        $("#templateName").show();
-      }
-    });
-
     $("#letters").change(function () {
-      enableDisableCreateLetterButton();
+      enableDisableButtonSaveLetterToServer();
     });
 
     $("#serverSettings").change(function () {
-      enableDisableLoginButton();
+      enableDisableButtonLogin();
     });
 
     $("#templateName").blur(function () {
-      enableDisableCreateTemplateButton();
+      enableDisableButtonSaveTemplateToServer();
     });
 
     $("#caseId").blur(function () {
-      enableDisableCreateLetterButton();
+      enableDisableButtonSaveLetterToServer();
     });
 
     $("#username").blur(function () {
-      enableDisableLoginButton();
+      enableDisableButtonLogin();
     });
 
     $("#password").blur(function () {
-      enableDisableLoginButton();
+      enableDisableButtonLogin();
+    });
+
+    $("#fromExistingTemplate").change(function () {
+      enableDisableButtonSaveTemplateToServer();
+      if ($(this).prop("checked")) {
+        $("#templateName").val("");
+        $("#templateNameDiv").hide();
+        $("#selectTemplateDiv").show();
+      } else {
+        $("#selectTemplateDiv").hide();
+        $("#templateNameDiv").show();
+      }
     });
   }
 });
@@ -86,6 +88,7 @@ function getTemplates() {
     if (request.readyState == 4) {
       $("#templates").prop("disabled", false);
       $("#templates").css("background-size", "0%");
+      $("#templates").find('option').remove().end();
       for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
         $("#templates").append('<option value="' + key + '">' + value + "</option>");
       }
@@ -108,6 +111,7 @@ function getLetters() {
     if (request.readyState == 4) {
       $("#letters").prop("disabled", false);
       $("#letters").css("background-size", "0%");
+      $("#letters").find('option').remove().end();
       for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
         $("#letters").append('<option value="' + key + '">' + value + "</option>");
       }
@@ -130,6 +134,7 @@ function getVariables() {
     if (request.readyState == 4) {
       $("#variables").prop("disabled", false);
       $("#variables").css("background-size", "0%");
+      $("#variables").find('option').remove().end();
       for (const [key, value] of Object.entries(JSON.parse(request.response).data.letter_variables_list)) {
         $("#variables").append('<option value="' + key + '">' + value + "</option>");
       }
@@ -187,8 +192,8 @@ function updateStatus(message, type) {
 
 // Get all of the content from a PowerPoint or Word document in 100-KB chunks of text.
 function createDocument(documentType) {
-  $("#createTemplate").prop("disabled", true);
-  $("#createLetter").prop("disabled", true);
+  $("#saveTemplateToServer").prop("disabled", true);
+  $("#saveLetterToServer").prop("disabled", true);
   Office.context.document.getFileAsync("compressed", { sliceSize: 4000000 }, function (result) {
     if (result.status == Office.AsyncResultStatus.Succeeded) {
       // Get the File object from the result.
@@ -250,8 +255,8 @@ function sendSlice(slice, state) {
           getSlice(state);
         } else {
           closeFile(state);
-          $("#createTemplate").prop("disabled", false);
-          $("#createLetter").prop("disabled", false);
+          $("#saveTemplateToServer").prop("disabled", false);
+          $("#saveLetterToServer").prop("disabled", false);
         }
       }
     };
@@ -262,10 +267,8 @@ function sendSlice(slice, state) {
     formData.append("slice_no", state.counter + 1);
 
     if (state.type === "template") {
-      const selectedTemplateName = $("#templates")
-        .find(":selected")
-        .val();
-      if (selectedTemplateName === "New") {
+      const selectedTemplateName = $("#templates").find(":selected").val();
+      if ($("#templateName").val()) {
         formData.append("letter_name", $("#templateName").val());
       } else {
         formData.append("letter_id", selectedTemplateName);
@@ -289,13 +292,15 @@ function sendSlice(slice, state) {
   }
 }
 
-// Close file.
+// Close the file when you're done with it.
 function closeFile(state) {
-  // Close the file when you're done with it.
   state.file.closeAsync(function (result) {
     // If the result returns as a success, the
     // file has been successfully closed.
     if (result.status == "succeeded") {
+      // Get the updated list of templates & letters
+      getTemplates();
+      getLetters();
       updateStatus("File sent successfully.", "success");
     } else {
       updateStatus("File couldn't be sent.", "danger");
@@ -371,9 +376,6 @@ function updateUserState() {
     $("#lettersForm").show();
     $("#lettersLabel").hide();
 
-    $("#variablesForm").show();
-    $("#variablesLabel").hide();
-
     $("#formLogin").hide();
     $("#logout").show();
   } else {
@@ -385,16 +387,13 @@ function updateUserState() {
     $("#lettersForm").hide();
     $("#lettersLabel").show();
 
-    $("#variablesForm").hide();
-    $("#variablesLabel").show();
-
     $("#logout").hide();
     $("#formLogin").show();
   }
 }
 
 // Enable/disable login button
-function enableDisableLoginButton() {
+function enableDisableButtonLogin() {
   if ($("#serverSettings").val() && $("#username").val() && $("#password").val()) {
     $("#login").prop("disabled", false);
   } else {
@@ -403,19 +402,19 @@ function enableDisableLoginButton() {
 }
 
 // Enable/disable create template button
-function enableDisableCreateTemplateButton() {
-  if (($("#templates").val() !== "New") || ($("#templates").val() && $("#templateName").val())) {
-    $("#createTemplate").prop("disabled", false);
+function enableDisableButtonSaveTemplateToServer() {
+  if ($("#fromExistingTemplate").prop("checked") || $("#templateName").val()) {
+    $("#saveTemplateToServer").prop("disabled", false);
   } else {
-    $("#createTemplate").prop("disabled", true);
+    $("#saveTemplateToServer").prop("disabled", true);
   }
 }
 
 // Enable/disable create letter button
-function enableDisableCreateLetterButton() {
+function enableDisableButtonSaveLetterToServer() {
   if ($("#caseId").val() && $("#letters").val()) {
-    $("#createLetter").prop("disabled", false);
+    $("#saveLetterToServer").prop("disabled", false);
   } else {
-    $("#createLetter").prop("disabled", true);
+    $("#saveLetterToServer").prop("disabled", true);
   }
 }
