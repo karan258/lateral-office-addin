@@ -172,7 +172,7 @@ function fetchAPIs() {
 }
 
 // Add variable/placeholder next to the cursor.
-export async function addVariable() {
+async function addVariable() {
   return Word.run(async context => {
     // insert text next to cursor.
     const selectedVariable = $("#variables").find(":selected").text();
@@ -335,9 +335,9 @@ function authenticate() {
 
 // Set authentication token in local storage.
 function setAuthenticationToken(userData) {
-  window.localStorage.setItem("serverSettings", $("#serverSettings").val());
   window.localStorage.setItem("token", userData.remote_token);
   window.localStorage.setItem("name", userData.name);
+  window.localStorage.setItem("serverSettings", $("#serverSettings").val());
   Office.context.document.settings.saveAsync(function (asyncResult) {
     if (asyncResult.status == Office.AsyncResultStatus.Failed) {
       updateStatus(asyncResult.error.message, "danger");
@@ -349,8 +349,9 @@ function setAuthenticationToken(userData) {
 
 // Logout and remove stored data.
 function logout() {
-  Office.context.document.settings.remove("token");
-  Office.context.document.settings.remove("name");
+  window.localStorage.removeItem("token");
+  window.localStorage.removeItem("name");
+  window.localStorage.removeItem("serverSettings");
   Office.context.document.settings.saveAsync(function (asyncResult) {
     if (asyncResult.status == Office.AsyncResultStatus.Failed) {
       updateStatus(asyncResult.error.message, "danger");
