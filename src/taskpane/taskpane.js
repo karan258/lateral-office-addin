@@ -95,8 +95,8 @@ function getTemplates() {
     }
   };
 
-  request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_letter_details");
-  request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
+  request.open("GET", window.localStorage.getItem("serverSettings") + "b/system/v3/letter/get_letter_details");
+  request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
   request.send();
 }
@@ -118,8 +118,8 @@ function getLetters() {
     }
   };
 
-  request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_letter_details");
-  request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
+  request.open("GET", window.localStorage.getItem("serverSettings") + "b/system/v3/letter/get_letter_details");
+  request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
   request.send();
 }
@@ -141,8 +141,8 @@ function getVariables() {
     }
   };
 
-  request.open("GET", Office.context.document.settings.get("serverSettings") + "b/system/v3/letter/get_variable_list");
-  request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
+  request.open("GET", window.localStorage.getItem("serverSettings") + "b/system/v3/letter/get_variable_list");
+  request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
   request.setRequestHeader("Accept", "application/json, text/plain, */*");
   request.send();
 }
@@ -278,8 +278,8 @@ function sendSlice(slice, state) {
       formData.append("file_name", state.filename);
     }
 
-    request.open("POST", Office.context.document.settings.get("serverSettings") + "b/system/v3/" + state.type + "/create");
-    request.setRequestHeader("authorisation", Office.context.document.settings.get("token"));
+    request.open("POST", window.localStorage.getItem("serverSettings") + "b/system/v3/" + state.type + "/create");
+    request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
     request.setRequestHeader("Accept", "application/json, text/plain, */*");
 
     // Send the file as the body of an HTTP POST
@@ -335,9 +335,9 @@ function authenticate() {
 
 // Set authentication token in local storage.
 function setAuthenticationToken(userData) {
-  Office.context.document.settings.set("serverSettings", $("#serverSettings").val());
-  Office.context.document.settings.set("token", userData.remote_token);
-  Office.context.document.settings.set("name", userData.name);
+  window.localStorage.setItem("serverSettings", $("#serverSettings").val());
+  window.localStorage.setItem("token", userData.remote_token);
+  window.localStorage.setItem("name", userData.name);
   Office.context.document.settings.saveAsync(function (asyncResult) {
     if (asyncResult.status == Office.AsyncResultStatus.Failed) {
       updateStatus(asyncResult.error.message, "danger");
@@ -363,8 +363,8 @@ function logout() {
 
 // Update the elements as per the user state.
 function updateUserState() {
-  if (Office.context.document.settings.get("token")) {
-    $("#helloUser").text(Office.context.document.settings.get("name"));
+  if (window.localStorage.getItem("token")) {
+    $("#helloUser").text(window.localStorage.getItem("name"));
 
     $("#mainContent").show();
 
