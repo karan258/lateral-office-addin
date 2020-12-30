@@ -43,28 +43,45 @@
         <h2 class="ms-font-xl">Please sideload your add-in to see app body.</h2>
     </section>
     <main id="app-body" class="ms-welcome__main" style="display: none;">
-        <div class="container">
+        <div class="form-group" id="logoutDiv">
+            <label id="helloUser"></label>
+            <a type="button" id="logout" class="ml-1">
+                <i class="fa fa-power-off" data-toggle="tooltip" title="Logout" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="container" id="settings">
+            <form id="formLogin">
+                <div class="form-group">
+                    <input id="subDomain" name="subDomain" type="text" class="form-control" placeholder="Sub Domain">
+                </div>
+                <button id="fetchAPIs" type="button" class="btn btn-primary btn-sm mb-2">Fetch Servers</button>
+                <div class="form-group">
+                    <label for="serverSettings">Select Server</label>
+                    <select class="form-control" id="serverSettings" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                </div>
+                <button type="button" id="login" class="btn btn-primary btn-sm">Login</button>
+            </form>
+        </div>
+
+        <div class="container" id="mainContent">
             <ul class="nav nav-tabs row" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" id="letter-tab" data-toggle="tab" href="#letter" role="tab" aria-controls="letter" aria-selected="false">
-                        <!-- <i class="fa fa-file-text-o" data-toggle="tooltip" title="Letters" aria-hidden="true"></i> -->
-                        Letters
-                    </a>
+                    <a class="nav-link active" id="letter-tab" data-toggle="tab" href="#letter" role="tab" aria-controls="letter" aria-selected="false">Letters</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" id="template-tab" data-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="true">
-                        <!-- <i class="fa fa-files-o" data-toggle="tooltip" title="Templates" aria-hidden="true"></i> -->
-                        Templates
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">
-                        <i class="fa fa-cog" data-toggle="tooltip" title="Settings" aria-hidden="true"></i>
-                    </a>
+                    <a class="nav-link" id="template-tab" data-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="true">Templates</a>
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
-                <div class="row tab-pane fade my-4" id="letter" role="tabpanel" aria-labelledby="letter-tab">
+                <div class="row tab-pane fade my-4 show active" id="letter" role="tabpanel" aria-labelledby="letter-tab">
                     <form id="lettersForm">
                         <input type="text" id="caseId" name="caseId" class="form-control" placeholder="Case ID">
                         <div class="form-group mt-2">
@@ -74,9 +91,8 @@
                         </div>
                         <button id='saveLetterToServer' class="btn btn-primary btn-sm" type="button">Save to Server</button>
                     </form>
-                    <h7 id="lettersLabel">Please login from the settings tab to continue.</h7>
                 </div>
-                <div class="row tab-pane fade my-4 show active" id="template" role="tabpanel" aria-labelledby="template-tab">
+                <div class="row tab-pane fade my-4" id="template" role="tabpanel" aria-labelledby="template-tab">
                     <form id="templatesForm">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" id="fromExistingTemplate">
@@ -101,31 +117,6 @@
                         </div>
                         <button id="addVariable" type="button" class="btn btn-primary btn-sm mb-2">Add Variable</button>
                     </form>
-                    <h7 id="templatesLabel">Please login from the settings tab to continue.</h7>
-                </div>
-                <div class="row tab-pane fade my-4" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                    <form id="formLogin">
-                        <div class="form-group">
-                            <input id="subDomain" name="subDomain" type="text" class="form-control" placeholder="Sub Domain">
-                        </div>
-                        <button id="fetchAPIs" type="button" class="btn btn-primary btn-sm mb-2">Fetch Servers</button>
-                        <div class="form-group">
-                            <label for="serverSettings">Select Server</label>
-                            <select class="form-control" id="serverSettings" style="background-image: url('../../assets/ajax-loader.gif'); background-repeat: no-repeat; background-position: center; background-size: 0%">
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-                        </div>
-                        <button type="button" id="login" class="btn btn-primary btn-sm">Login</button>
-                    </form>
-                    <div class="form-group">
-                        <label id="helloUser"></label>
-                    </div>
-                    <button type="button" id="logout" class="btn btn-primary btn-sm">Logout</button>
                 </div>
                 <div class="row" id="status"></div>
             </div>

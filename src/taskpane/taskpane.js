@@ -176,11 +176,7 @@ export async function addVariable() {
   return Word.run(async context => {
     // insert text next to cursor.
     const selectedVariable = $("#variables").find(":selected").text();
-    const paragraph = context.document.getSelection().insertText("{" + selectedVariable + "}", Word.InsertLocation.end);
-
-    // change the paragraph color to blue.
-    paragraph.font.color = "blue";
-
+    context.document.getSelection().insertText("{" + selectedVariable + "}", Word.InsertLocation.end);
     await context.sync();
   });
 }
@@ -368,26 +364,18 @@ function logout() {
 // Update the elements as per the user state.
 function updateUserState() {
   if (Office.context.document.settings.get("token")) {
-    $("#helloUser").text("Hello " + Office.context.document.settings.get("name") + "!");
+    $("#helloUser").text(Office.context.document.settings.get("name"));
 
-    $("#templatesForm").show();
-    $("#templatesLabel").hide();
-
-    $("#lettersForm").show();
-    $("#lettersLabel").hide();
+    $("#mainContent").show();
 
     $("#formLogin").hide();
-    $("#logout").show();
+    $("#logoutDiv").show();
   } else {
     $("#helloUser").text("");
 
-    $("#templatesForm").hide();
-    $("#templatesLabel").show();
+    $("#mainContent").hide();
 
-    $("#lettersForm").hide();
-    $("#lettersLabel").show();
-
-    $("#logout").hide();
+    $("#logoutDiv").hide();
     $("#formLogin").show();
   }
 }
