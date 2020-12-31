@@ -32,6 +32,7 @@ Office.onReady(info => {
     document.getElementById("login").onclick = authenticate;
     document.getElementById("logout").onclick = logout;
     document.getElementById("fetchAPIs").onclick = fetchAPIs;
+    document.getElementById("loadLetter").onclick = loadLetter;
 
     $("#saveTemplateToServer").click(function () {
       createDocument("template");
@@ -238,21 +239,26 @@ function sendSlice(slice, state) {
     // when the request has been sent.
     request.onreadystatechange = function () {
       if (request.readyState == 4) {
-        updateStatus("Sent " + slice.size + " bytes.", "success");
-        state.counter++;
-        if (state.counter < state.sliceCount) {
-          if (JSON.parse(request.response).filename) {
-            state.filename = JSON.parse(request.response).filename;
-            updateStatus("file name:" + JSON.parse(request.response).filename, "success");
-          } else {
-            updateStatus("file not created.", "danger");
-          }
-
-          getSlice(state);
+        const response = JSON.parse(request.response);
+        if (!response.result) {
+          updateStatus(response.message, "danger");
         } else {
-          closeFile(state);
-          $("#saveTemplateToServer").prop("disabled", false);
-          $("#saveLetterToServer").prop("disabled", false);
+          updateStatus("Sent " + slice.size + " bytes.", "success");
+          state.counter++;
+          if (state.counter < state.sliceCount) {
+            if (response.filename) {
+              state.filename = response.filename;
+              updateStatus("file name:" + response.filename, "success");
+            } else {
+              updateStatus("file not created.", "danger");
+            }
+
+            getSlice(state);
+          } else {
+            closeFile(state);
+            $("#saveTemplateToServer").prop("disabled", false);
+            $("#saveLetterToServer").prop("disabled", false);
+          }
         }
       }
     };
@@ -297,9 +303,9 @@ function closeFile(state) {
       // Get the updated list of templates & letters
       getTemplates();
       getLetters();
-      updateStatus("File sent successfully.", "success");
+      updateStatus("File saved to the server successfully.", "success");
     } else {
-      updateStatus("File couldn't be sent.", "danger");
+      updateStatus("File couldn't be saved to the server.", "danger");
     }
   });
 }
@@ -406,4 +412,39 @@ function enableDisableButtonSaveLetterToServer() {
   } else {
     $("#saveLetterToServer").prop("disabled", true);
   }
+}
+
+// Load letter from server
+async function loadLetter() {
+  $("#loadLetter").prop("disabled", true);
+  return Word.run(async context => {
+    const base64Document = await getDocumentAsBase64();
+    context.document.body.insertFileFromBase64(base64Document, Word.InsertLocation.replace);
+    await context.sync();
+  });
+}
+
+// Get the document in base64 format
+function getDocumentAsBase64() {
+  return new Promise(function (resolve, reject) {
+    const request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+      if (request.readyState == 4) {
+        $("#loadLetter").prop("disabled", false);
+        const response = JSON.parse(request.response);
+        if (response.result) {
+          resolve(response.data);
+        } else {
+          updateStatus(response.message, "danger");
+          reject(request.status);
+        }
+      }
+    }
+
+    request.open("GET", window.localStorage.getItem("serverSettings") + "b/system/v3/template/load_template?template_id=" + $("#letters").find(":selected").val());
+    request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
+    request.setRequestHeader("Accept", "application/json, text/plain, */*");
+    request.send();
+  });
 }
