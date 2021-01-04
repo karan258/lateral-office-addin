@@ -33,6 +33,7 @@ Office.onReady(info => {
     document.getElementById("logout").onclick = logout;
     document.getElementById("fetchAPIs").onclick = fetchAPIs;
     document.getElementById("loadLetter").onclick = loadLetter;
+    document.getElementById("loadTemplate").onclick = loadTemplate;
 
     $("#saveTemplateToServer").click(function () {
       createDocument("template");
@@ -71,8 +72,10 @@ Office.onReady(info => {
         $("#templateName").val("");
         $("#templateNameDiv").hide();
         $("#selectTemplateDiv").show();
+        $("#loadTemplate").show();
       } else {
         $("#selectTemplateDiv").hide();
+        $("#loadTemplate").hide();
         $("#templateNameDiv").show();
       }
     });
@@ -87,11 +90,18 @@ function getTemplates() {
 
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-      $("#templates").prop("disabled", false);
-      $("#templates").css("background-size", "0%");
-      $("#templates").find('option').remove().end();
-      for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
-        $("#templates").append('<option value="' + key + '">' + value + "</option>");
+      if (!JSON.parse(request.response).result) {
+        updateStatus("Authentication token expired. Please login again.", "danger");
+        setTimeout(function () {
+          logout();
+        }, 1000);
+      } else {
+        $("#templates").prop("disabled", false);
+        $("#templates").css("background-size", "0%");
+        $("#templates").find('option').remove().end();
+        for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
+          $("#templates").append('<option value="' + key + '">' + value + "</option>");
+        }
       }
     }
   };
@@ -110,11 +120,18 @@ function getLetters() {
 
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-      $("#letters").prop("disabled", false);
-      $("#letters").css("background-size", "0%");
-      $("#letters").find('option').remove().end();
-      for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
-        $("#letters").append('<option value="' + key + '">' + value + "</option>");
+      if (!JSON.parse(request.response).result) {
+        updateStatus("Authentication token expired. Please login again.", "danger");
+        setTimeout(function () {
+          logout();
+        }, 1000);
+      } else {
+        $("#letters").prop("disabled", false);
+        $("#letters").css("background-size", "0%");
+        $("#letters").find('option').remove().end();
+        for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
+          $("#letters").append('<option value="' + key + '">' + value + "</option>");
+        }
       }
     }
   };
@@ -133,11 +150,18 @@ function getVariables() {
 
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-      $("#variables").prop("disabled", false);
-      $("#variables").css("background-size", "0%");
-      $("#variables").find('option').remove().end();
-      for (const [key, value] of Object.entries(JSON.parse(request.response).data.letter_variables_list)) {
-        $("#variables").append('<option value="' + key + '">' + value + "</option>");
+      if (!JSON.parse(request.response).result) {
+        updateStatus("Authentication token expired. Please login again.", "danger");
+        setTimeout(function () {
+          logout();
+        }, 1000);
+      } else {
+        $("#variables").prop("disabled", false);
+        $("#variables").css("background-size", "0%");
+        $("#variables").find('option').remove().end();
+        for (const [key, value] of Object.entries(JSON.parse(request.response).data.letter_variables_list)) {
+          $("#variables").append('<option value="' + key + '">' + value + "</option>");
+        }
       }
     }
   };
@@ -371,7 +395,7 @@ function logout() {
 // Update the elements as per the user state.
 function updateUserState() {
   if (window.localStorage.getItem("token")) {
-    $("#helloUser").text(window.localStorage.getItem("name"));
+    $("#helloUser").text("Hello " + window.localStorage.getItem("name") + "!");
 
     $("#mainContent").show();
 
@@ -409,8 +433,10 @@ function enableDisableButtonSaveTemplateToServer() {
 function enableDisableButtonSaveLetterToServer() {
   if ($("#caseId").val() && $("#letters").val()) {
     $("#saveLetterToServer").prop("disabled", false);
+    $("#loadLetter").prop("disabled", false);
   } else {
     $("#saveLetterToServer").prop("disabled", true);
+    $("#loadLetter").prop("disabled", true);
   }
 }
 
@@ -418,14 +444,24 @@ function enableDisableButtonSaveLetterToServer() {
 async function loadLetter() {
   $("#loadLetter").prop("disabled", true);
   return Word.run(async context => {
-    const base64Document = await getDocumentAsBase64();
+    const base64Document = await getDocumentAsBase64($("#letters").find(":selected").val(), $("#caseId").val());
+    context.document.body.insertFileFromBase64(base64Document, Word.InsertLocation.replace);
+    await context.sync();
+  });
+}
+
+// Load template from server
+async function loadTemplate() {
+  $("#loadTemplate").prop("disabled", true);
+  return Word.run(async context => {
+    const base64Document = await getDocumentAsBase64($("#templates").find(":selected").val());
     context.document.body.insertFileFromBase64(base64Document, Word.InsertLocation.replace);
     await context.sync();
   });
 }
 
 // Get the document in base64 format
-function getDocumentAsBase64() {
+function getDocumentAsBase64(documentId, caseId) {
   return new Promise(function (resolve, reject) {
     const request = new XMLHttpRequest();
 
@@ -442,7 +478,11 @@ function getDocumentAsBase64() {
       }
     }
 
-    request.open("GET", window.localStorage.getItem("serverSettings") + "b/system/v3/template/load_template?template_id=" + $("#letters").find(":selected").val());
+    let url = window.localStorage.getItem("serverSettings") + "b/system/v3/template/load_template?template_id=" + documentId;
+    if (caseId) {
+      url = url + "&caseid=" + caseId;
+    }
+    request.open("GET", url);
     request.setRequestHeader("authorisation", window.localStorage.getItem("token"));
     request.setRequestHeader("Accept", "application/json, text/plain, */*");
     request.send();
