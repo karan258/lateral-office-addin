@@ -20,6 +20,7 @@ Office.onReady(info => {
     $("#serverSettings").prop("disabled", true);
 
     enableDisableButtonLogin();
+    enableDisableButtonFetchServers();
     enableDisableButtonSaveTemplateToServer();
     enableDisableButtonSaveLetterToServer();
     updateUserState();
@@ -31,14 +32,22 @@ Office.onReady(info => {
     document.getElementById("addVariable").onclick = addVariable;
     document.getElementById("login").onclick = authenticate;
     document.getElementById("logout").onclick = logout;
-    document.getElementById("fetchAPIs").onclick = fetchAPIs;
+    document.getElementById("fetchServers").onclick = fetchServers;
     document.getElementById("loadLetter").onclick = loadLetter;
     document.getElementById("loadTemplate").onclick = loadTemplate;
 
     $("#saveTemplateToServer").click(function () {
+      $("#saveTemplateToServer")
+        .empty()
+        .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving to Server...')
+        .prop("disabled", true);
       createDocument("template");
     });
     $("#saveLetterToServer").click(function () {
+      $("#saveLetterToServer")
+        .empty()
+        .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving to Server...')
+        .prop("disabled", true);
       createDocument("letter");
     });
 
@@ -66,6 +75,10 @@ Office.onReady(info => {
       enableDisableButtonLogin();
     });
 
+    $("#subDomain").change(function () {
+      enableDisableButtonFetchServers();
+    });
+
     $("#fromExistingTemplate").change(function () {
       enableDisableButtonSaveTemplateToServer();
       if ($(this).prop("checked")) {
@@ -84,8 +97,9 @@ Office.onReady(info => {
 
 // Fetch templates from backend.
 function getTemplates() {
-  $("#templates").prop("disabled", true);
-  $("#templates").css("background-size", "auto");
+  $("#templates")
+    .prop("disabled", true)
+    .css("background-size", "auto");
   const request = new XMLHttpRequest();
 
   request.onreadystatechange = function () {
@@ -96,9 +110,10 @@ function getTemplates() {
           logout();
         }, 1000);
       } else {
-        $("#templates").prop("disabled", false);
-        $("#templates").css("background-size", "0%");
-        $("#templates").find('option').remove().end();
+        $("#templates")
+          .prop("disabled", false)
+          .css("background-size", "0%")
+          .find('option').remove().end();
         for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
           $("#templates").append('<option value="' + key + '">' + value + "</option>");
         }
@@ -114,8 +129,9 @@ function getTemplates() {
 
 // Fetch letters from backend.
 function getLetters() {
-  $("#letters").prop("disabled", true);
-  $("#letters").css("background-size", "auto");
+  $("#letters")
+    .prop("disabled", true)
+    .css("background-size", "auto");
   const request = new XMLHttpRequest();
 
   request.onreadystatechange = function () {
@@ -126,9 +142,10 @@ function getLetters() {
           logout();
         }, 1000);
       } else {
-        $("#letters").prop("disabled", false);
-        $("#letters").css("background-size", "0%");
-        $("#letters").find('option').remove().end();
+        $("#letters")
+          .prop("disabled", false)
+          .css("background-size", "0%")
+          .find('option').remove().end();
         for (const [key, value] of Object.entries(JSON.parse(request.response).data)) {
           $("#letters").append('<option value="' + key + '">' + value + "</option>");
         }
@@ -173,15 +190,21 @@ function getVariables() {
 }
 
 // Fetch the list of available APIs from backend.
-function fetchAPIs() {
-  $("#fetchAPIs").prop("disabled", true);
+function fetchServers() {
+  $("#fetchServers")
+    .empty()
+    .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Fetching Servers...')
+    .prop("disabled", true);
   $("#subDomain").prop("disabled", true);
   $("#serverSettings").css("background-size", "auto");
   const request = new XMLHttpRequest();
 
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-      $("#fetchAPIs").prop("disabled", false);
+      $("#fetchServers")
+        .empty()
+        .append('Fetch Servers')
+        .prop("disabled", false);
       $("#serverSettings").prop("disabled", false);
       $("#serverSettings").css("background-size", "0%");
 
@@ -213,8 +236,6 @@ function updateStatus(message, type) {
 
 // Get all of the content from a PowerPoint or Word document in 100-KB chunks of text.
 function createDocument(documentType) {
-  $("#saveTemplateToServer").prop("disabled", true);
-  $("#saveLetterToServer").prop("disabled", true);
   Office.context.document.getFileAsync("compressed", { sliceSize: 4000000 }, function (result) {
     if (result.status == Office.AsyncResultStatus.Succeeded) {
       // Get the File object from the result.
@@ -280,8 +301,14 @@ function sendSlice(slice, state) {
             getSlice(state);
           } else {
             closeFile(state);
-            $("#saveTemplateToServer").prop("disabled", false);
-            $("#saveLetterToServer").prop("disabled", false);
+            $("#saveTemplateToServer")
+              .empty()
+              .append('Save to Server')
+              .prop("disabled", false);
+            $("#saveLetterToServer")
+              .empty()
+              .append('Save to Server')
+              .prop("disabled", false);
           }
         }
       }
@@ -336,12 +363,19 @@ function closeFile(state) {
 
 // Authenticate user.
 function authenticate() {
-  $("#login").prop("disabled", true);
+  $("#login")
+    .empty()
+    .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Authenticating...')
+    .prop("disabled", true);
+  $("#subDomain").prop("disabled", true);
   const request = new XMLHttpRequest();
 
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-      $("#login").prop("disabled", false);
+      $("#login")
+        .empty()
+        .append('Login')
+        .prop("disabled", false);
       if (JSON.parse(request.response).result) {
         setAuthenticationToken(JSON.parse(request.response).data);
         location.reload();
@@ -440,9 +474,21 @@ function enableDisableButtonSaveLetterToServer() {
   }
 }
 
+// Enable/disable fetch servers button
+function enableDisableButtonFetchServers() {
+  if ($("#subDomain").val()) {
+    $("#fetchServers").prop("disabled", false);
+  } else {
+    $("#fetchServers").prop("disabled", true);
+  }
+}
+
 // Load letter from server
 async function loadLetter() {
-  $("#loadLetter").prop("disabled", true);
+  $("#loadLetter")
+    .empty()
+    .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...')
+    .prop("disabled", true);
   return Word.run(async context => {
     const base64Document = await getDocumentAsBase64($("#letters").find(":selected").val(), $("#caseId").val());
     context.document.body.insertFileFromBase64(base64Document, Word.InsertLocation.replace);
@@ -452,7 +498,10 @@ async function loadLetter() {
 
 // Load template from server
 async function loadTemplate() {
-  $("#loadTemplate").prop("disabled", true);
+  $("#loadTemplate")
+    .empty()
+    .append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...')
+    .prop("disabled", true);
   return Word.run(async context => {
     const base64Document = await getDocumentAsBase64($("#templates").find(":selected").val());
     context.document.body.insertFileFromBase64(base64Document, Word.InsertLocation.replace);
@@ -467,7 +516,17 @@ function getDocumentAsBase64(documentId, caseId) {
 
     request.onreadystatechange = function () {
       if (request.readyState == 4) {
-        $("#loadLetter").prop("disabled", false);
+        if (caseId) {
+          $("#loadLetter")
+            .empty()
+            .append('Load')
+            .prop("disabled", false);
+        } else {
+          $("#loadTemplate")
+            .empty()
+            .append('Load')
+            .prop("disabled", false);
+        }
         const response = JSON.parse(request.response);
         if (response.result) {
           resolve(response.data);
