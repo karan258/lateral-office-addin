@@ -2,15 +2,15 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
   <Id>81f6b0c5-7973-40c2-9e1c-f19d33e44992</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Contoso</ProviderName>
+  <ProviderName>Lateral Technology Limited</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Lateral"/>
-  <Description DefaultValue="A template to get started."/>
-  <IconUrl DefaultValue="https://localhost:3000/assets/lateral_logo_32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/lateral_logo_80.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <Description DefaultValue="An add-in provided by Lateral Technology Limited"/>
+  <IconUrl DefaultValue="https://static.nodeb.lateral1.com/lateral_logo_32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://static.nodeb.lateral1.com/lateral_logo_64.png"/>
+  <SupportUrl DefaultValue="https://getlateral.com"/>
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://getlateral.com</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document"/>
@@ -62,9 +62,9 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/lateral_logo_16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/lateral_logo_32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/lateral_logo_80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://static.nodeb.lateral1.com/lateral_logo_16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://static.nodeb.lateral1.com/lateral_logo_32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://static.nodeb.lateral1.com/lateral_logo_64.png"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
